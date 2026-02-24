@@ -49,7 +49,7 @@ Note:
 
 ### 3️⃣ Official CDN Font Awesome v7.2.0 Pro
 
-Simply add the following CSS links to the <head> section of your HTML file:
+Simply add the following CSS links to the `head` section of your HTML file:
 
 ```html
 <link

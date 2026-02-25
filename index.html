@@ -74,7 +74,6 @@
         color: #79c0ff;
         text-decoration: none;
       }
-
       footer {
         margin-top: 60px;
         padding-top: 20px;
@@ -142,6 +141,7 @@
           return;
         }
 
+        /* STYLE */
         let style = "solid";
         if (classes.includes("fa-regular") || classes.includes("far"))
           style = "regular";
@@ -165,6 +165,7 @@
           "fat",
         ]);
 
+        /* ICON NAME */
         let name = "";
         for (let i = fa.length - 1; i >= 0; i--) {
           if (!STYLE_SET.has(fa[i])) {
@@ -178,6 +179,7 @@
           return;
         }
 
+        /* FAMILY */
         let family = null;
 
         const EXPLICIT_FAMILIES = [
@@ -224,11 +226,7 @@
           }
         }
 
-        const IMPLICIT_DUO = new Set(["notdog", "jelly"]);
-        if (family && IMPLICIT_DUO.has(family)) {
-          family = family + "-duo";
-        }
-
+        /* PATH */
         let path;
         if (family === "brands") path = "brands";
         else if (family === "duotone")
@@ -241,7 +239,7 @@
         const cropped = `${base}/${path}/${name}.svg`;
         const full = `${base}-full/${path}/${name}.svg`;
 
-        /* ⭐ FULL FIRST (default) */
+        /* FULL DEFAULT */
         result.innerHTML = `
 <strong>Icon:</strong> ${path} / ${name}<br><br>
 <strong>Full (default):</strong> <a href="${full}" target="_blank">${full}</a><br>
@@ -250,18 +248,15 @@
 `;
 
         try {
-          /* ⭐ FETCH FULL */
           const res = await fetch(full);
           if (!res.ok) throw new Error();
           const svg = await res.text();
 
-          /* ⭐ PREVIEW FULL */
           preview.innerHTML = svg.replace(
             /<svg([^>]*)>/,
             '<svg$1 width="140" height="140">',
           );
 
-          /* ⭐ DOWNLOAD FULL */
           const blob = new Blob([svg], { type: "image/svg+xml" });
           const dl = URL.createObjectURL(blob);
           const a = document.createElement("a");

@@ -167,6 +167,12 @@
             break;
           }
 
+          /* ⭐ NEW LOGIC — support fa-sharp-* */
+          if (cls.startsWith("fa-sharp-")) {
+            family = cls.replace("fa-", "");
+            break;
+          }
+
           if (
             !STYLE_SET.has(cls) &&
             cls !== `fa-${name}` &&
@@ -205,18 +211,15 @@
 `;
 
         try {
-          /* ⭐ USE FULL NOW */
           const res = await fetch(full);
           if (!res.ok) throw new Error();
           const svg = await res.text();
 
-          /* preview full */
           preview.innerHTML = svg.replace(
             /<svg([^>]*)>/,
             '<svg$1 width="140" height="140">',
           );
 
-          /* auto download full */
           const blob = new Blob([svg], { type: "image/svg+xml" });
           const dl = URL.createObjectURL(blob);
           const a = document.createElement("a");

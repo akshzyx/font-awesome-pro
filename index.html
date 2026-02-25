@@ -74,6 +74,18 @@
         color: #79c0ff;
         text-decoration: none;
       }
+
+      footer {
+        margin-top: 60px;
+        padding-top: 20px;
+        border-top: 1px solid #30363d;
+        text-align: center;
+        font-size: 0.95em;
+        color: #8b949e;
+      }
+      footer a {
+        color: #79c0ff;
+      }
     </style>
   </head>
 
@@ -97,6 +109,14 @@
 
     <div id="result"></div>
     <div id="preview"></div>
+
+    <footer>
+      Made and maintained by <strong>TrES</strong>.<br />
+      Found a bug or want to contribute? Open an issue or pull request on
+      <a href="https://github.com/akshzyx/font-awesome-pro" target="_blank"
+        >GitHub</a
+      >.
+    </footer>
 
     <script>
       async function downloadIcon() {
@@ -122,16 +142,13 @@
           return;
         }
 
-        /* ---------- STYLE ---------- */
         let style = "solid";
-
         if (classes.includes("fa-regular") || classes.includes("far"))
           style = "regular";
         if (classes.includes("fa-light") || classes.includes("fal"))
           style = "light";
         if (classes.includes("fa-thin") || classes.includes("fat"))
           style = "thin";
-
         if (classes.includes("fa-semibold")) style = "semibold";
         if (classes.includes("fa-fill")) style = "fill";
 
@@ -148,7 +165,6 @@
           "fat",
         ]);
 
-        /* ---------- ICON NAME ---------- */
         let name = "";
         for (let i = fa.length - 1; i >= 0; i--) {
           if (!STYLE_SET.has(fa[i])) {
@@ -162,7 +178,6 @@
           return;
         }
 
-        /* ---------- FAMILY ---------- */
         let family = null;
 
         const EXPLICIT_FAMILIES = [
@@ -209,15 +224,12 @@
           }
         }
 
-        /* implicit duo families */
         const IMPLICIT_DUO = new Set(["notdog", "jelly"]);
         if (family && IMPLICIT_DUO.has(family)) {
           family = family + "-duo";
         }
 
-        /* ---------- PATH ---------- */
         let path;
-
         if (family === "brands") path = "brands";
         else if (family === "duotone")
           path = style !== "solid" ? `duotone-${style}` : "duotone";
@@ -226,26 +238,30 @@
         else path = style;
 
         const base = "https://site-assets.fontawesome.com/releases/v7.2.0/svgs";
-        const url = `${base}/${path}/${name}.svg`;
+        const cropped = `${base}/${path}/${name}.svg`;
         const full = `${base}-full/${path}/${name}.svg`;
 
+        /* ⭐ FULL FIRST (default) */
         result.innerHTML = `
 <strong>Icon:</strong> ${path} / ${name}<br><br>
-<strong>Main (cropped):</strong> <a href="${url}" target="_blank">${url}</a><br>
-<strong>Full (square):</strong> <a href="${full}" target="_blank">${full}</a>
+<strong>Full (default):</strong> <a href="${full}" target="_blank">${full}</a><br>
+<strong>Cropped:</strong> <a href="${cropped}" target="_blank">${cropped}</a>
 <p class="note">Only default colors are downloaded for now — custom colors (like duotone primary/secondary) are not included in the SVG file. Apply them later.</p>
 `;
 
         try {
+          /* ⭐ FETCH FULL */
           const res = await fetch(full);
           if (!res.ok) throw new Error();
           const svg = await res.text();
 
+          /* ⭐ PREVIEW FULL */
           preview.innerHTML = svg.replace(
             /<svg([^>]*)>/,
             '<svg$1 width="140" height="140">',
           );
 
+          /* ⭐ DOWNLOAD FULL */
           const blob = new Blob([svg], { type: "image/svg+xml" });
           const dl = URL.createObjectURL(blob);
           const a = document.createElement("a");

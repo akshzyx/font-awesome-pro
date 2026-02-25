@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Font Awesome SVG Downloader</title>
+
     <style>
       body {
         font-family:
@@ -13,9 +14,9 @@
         max-width: 900px;
         margin: 40px auto;
         padding: 20px;
-        line-height: 1.6;
         background: #0d1117;
         color: #c9d1d9;
+        position: relative;
       }
       h1 {
         color: #58a6ff;
@@ -26,24 +27,21 @@
         height: 140px;
         font-family: monospace;
         padding: 14px;
-        font-size: 15px;
         background: #161b22;
         color: #c9d1d9;
         border: 1px solid #30363d;
         border-radius: 8px;
-        resize: vertical;
       }
       button {
         display: block;
         margin: 20px auto;
         padding: 12px 32px;
-        font-size: 17px;
-        cursor: pointer;
         background: #238636;
-        color: white;
+        color: #fff;
         border: none;
         border-radius: 8px;
         font-weight: 600;
+        cursor: pointer;
       }
       button:hover {
         background: #2ea043;
@@ -58,31 +56,10 @@
       #preview {
         margin: 20px 0;
         padding: 20px;
-        background: #0d1117;
         border: 1px solid #30363d;
         border-radius: 10px;
         text-align: center;
         min-height: 100px;
-      }
-      a {
-        color: #79c0ff;
-        text-decoration: none;
-      }
-      a:hover {
-        text-decoration: underline;
-      }
-      .download-btn {
-        display: inline-block;
-        margin: 12px 0;
-        padding: 10px 20px;
-        background: #238636;
-        color: white;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 500;
-      }
-      .download-btn:hover {
-        background: #2ea043;
       }
       .error {
         color: #f85149;
@@ -93,21 +70,26 @@
         color: #8b949e;
         margin-top: 16px;
       }
+      a {
+        color: #79c0ff;
+        text-decoration: none;
+      }
     </style>
   </head>
+
   <body>
     <h1>Font Awesome SVG Downloader</h1>
+
     <p style="text-align: center">
       Paste your Font Awesome <code>&lt;i&gt;</code> tag below and click the
-      button.<br />Icons are downloaded automatically.
+      button to download the SVG.<br />
+      You can also self-host by cloning or deploying the repository.
     </p>
 
     <textarea
       id="input"
-      placeholder='Paste your <i> tag here...  
-Example: <i class="fa-duotone fa-light fa-trillium"></i>'
+      placeholder='<i class="fa-solid fa-star-of-david"></i>'
     ></textarea>
-
     <button onclick="downloadIcon()">Download SVG</button>
 
     <div id="result"></div>
@@ -122,7 +104,6 @@ Example: <i class="fa-duotone fa-light fa-trillium"></i>'
         result.innerHTML = "";
         preview.innerHTML = "";
 
-        // Extract class attribute
         const classMatch = input.match(/class="([^"]+)"/i);
         if (!classMatch) {
           result.innerHTML =
@@ -130,107 +111,149 @@ Example: <i class="fa-duotone fa-light fa-trillium"></i>'
           return;
         }
 
-        const classes = classMatch[1].split(/\s+/);
-        let family = "solid";
-        let style = "";
-        let name = "";
+        const classes = classMatch[1].split(/\s+/).map((c) => c.toLowerCase());
+        const fa = classes.filter((c) => c.startsWith("fa-"));
 
-        classes.forEach((cls) => {
-          cls = cls.toLowerCase();
-          if (
-            cls.startsWith("fa-") &&
-            ![
-              "fa-solid",
-              "fa-regular",
-              "fa-light",
-              "fa-thin",
-              "fa-duotone",
-              "fa-brands",
-              "fa-sharp",
-              "fa-classic",
-            ].includes(cls)
-          ) {
-            name = cls.replace(/^fa-/, "");
-          }
-          if (cls === "fa-solid" || cls === "fas") family = "solid";
-          if (cls === "fa-regular" || cls === "far") family = "regular";
-          if (cls === "fa-light" || cls === "fal") family = "light";
-          if (cls === "fa-thin" || cls === "fat") family = "thin";
-          if (cls === "fa-duotone" || cls === "fad") family = "duotone";
-          if (cls === "fa-brands" || cls === "fab") family = "brands";
-          if (cls === "fa-sharp") family = "sharp";
-          if (cls.startsWith("fa-sharp-")) {
-            family = "sharp";
-            style = cls.replace("fa-sharp-", "");
-          }
-        });
-
-        // Handle combined styles
-        if (family === "duotone") {
-          if (classes.includes("fa-light")) style = "light";
-          else if (classes.includes("fa-thin")) style = "thin";
-          else if (classes.includes("fa-regular")) style = "regular";
-        }
-        if (family === "sharp" && !style) style = "solid";
-
-        if (!name) {
-          result.innerHTML =
-            '<p class="error">Could not find icon name (fa-xxx).</p>';
+        if (!fa.length) {
+          result.innerHTML = '<p class="error">No fa classes.</p>';
           return;
         }
 
-        const base = "https://site-assets.fontawesome.com/releases/v7.2.0/svgs";
-        const path =
-          family === "brands"
-            ? "brands"
-            : family === "duotone" && !style
-              ? "duotone"
-              : `${family}${style ? "-" + style : ""}`;
+        /* ---------- STYLE ---------- */
+        let style = "solid";
 
+        if (classes.includes("fa-regular") || classes.includes("far"))
+          style = "regular";
+        if (classes.includes("fa-light") || classes.includes("fal"))
+          style = "light";
+        if (classes.includes("fa-thin") || classes.includes("fat"))
+          style = "thin";
+
+        if (classes.includes("fa-semibold")) style = "semibold";
+        if (classes.includes("fa-fill")) style = "fill";
+
+        const STYLE_SET = new Set([
+          "fa-solid",
+          "fa-regular",
+          "fa-light",
+          "fa-thin",
+          "fa-semibold",
+          "fa-fill",
+          "fas",
+          "far",
+          "fal",
+          "fat",
+        ]);
+
+        /* ---------- ICON NAME ---------- */
+        let name = "";
+        for (let i = fa.length - 1; i >= 0; i--) {
+          if (!STYLE_SET.has(fa[i])) {
+            name = fa[i].replace("fa-", "");
+            break;
+          }
+        }
+
+        if (!name) {
+          result.innerHTML = '<p class="error">Could not find icon name.</p>';
+          return;
+        }
+
+        /* ---------- FAMILY ---------- */
+        let family = null;
+
+        const EXPLICIT_FAMILIES = [
+          "duotone",
+          "sharp",
+          "sharp-duotone",
+          "chisel",
+          "etch",
+          "graphite",
+          "jelly",
+          "jelly-duo",
+          "jelly-fill",
+          "notdog",
+          "notdog-duo",
+          "slab",
+          "slab-press",
+          "thumbprint",
+          "utility",
+          "utility-duo",
+          "utility-fill",
+          "whiteboard",
+          "brands",
+        ];
+
+        for (const cls of fa) {
+          const raw = cls.replace("fa-", "");
+
+          if (EXPLICIT_FAMILIES.includes(raw)) {
+            family = raw;
+            break;
+          }
+
+          if (cls.startsWith("fa-sharp-")) {
+            family = raw;
+            break;
+          }
+
+          if (
+            !STYLE_SET.has(cls) &&
+            cls !== `fa-${name}` &&
+            !cls.startsWith("fa-sharp")
+          ) {
+            family = raw;
+          }
+        }
+
+        /* implicit duo families */
+        const IMPLICIT_DUO = new Set(["notdog", "jelly"]);
+        if (family && IMPLICIT_DUO.has(family)) {
+          family = family + "-duo";
+        }
+
+        /* ---------- PATH ---------- */
+        let path;
+
+        if (family === "brands") path = "brands";
+        else if (family === "duotone")
+          path = style !== "solid" ? `duotone-${style}` : "duotone";
+        else if (family?.startsWith("sharp")) path = `${family}-${style}`;
+        else if (family) path = `${family}-${style}`;
+        else path = style;
+
+        const base = "https://site-assets.fontawesome.com/releases/v7.2.0/svgs";
         const url = `${base}/${path}/${name}.svg`;
-        const fullUrl = `${base}-full/${path}/${name}.svg`;
+        const full = `${base}-full/${path}/${name}.svg`;
 
         result.innerHTML = `
-        <strong>Icon:</strong> ${family}${style ? " " + style : ""} / ${name}<br><br>
-        <strong>Main (cropped):</strong> <a href="${url}" target="_blank">${url}</a><br>
-        <strong>Full (square):</strong> <a href="${fullUrl}" target="_blank">${fullUrl}</a>
-        <p class="note">Only default colors are downloaded for now — custom colors (like duotone primary/secondary) are not included in the SVG file. Apply them later in your code or editor.</p>
-      `;
+<strong>Icon:</strong> ${path} / ${name}<br><br>
+<strong>Main (cropped):</strong> <a href="${url}" target="_blank">${url}</a><br>
+<strong>Full (square):</strong> <a href="${full}" target="_blank">${full}</a>
+<p class="note">Only default colors are downloaded for now — custom colors (like duotone primary/secondary) are not included in the SVG file. Apply them later.</p>
+`;
 
         try {
-          const response = await fetch(url);
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const res = await fetch(full);
+          if (!res.ok) throw new Error();
+          const svg = await res.text();
 
-          const svgText = await response.text();
-
-          // Show preview
-          preview.innerHTML = svgText.replace(
+          preview.innerHTML = svg.replace(
             /<svg([^>]*)>/,
             '<svg$1 width="140" height="140">',
           );
 
-          // Trigger automatic download
-          const blob = new Blob([svgText], { type: "image/svg+xml" });
-          const downloadUrl = URL.createObjectURL(blob);
+          const blob = new Blob([svg], { type: "image/svg+xml" });
+          const dl = URL.createObjectURL(blob);
           const a = document.createElement("a");
-          a.href = downloadUrl;
+          a.href = dl;
           a.download = `${name}.svg`;
-          a.style.display = "none";
-          document.body.appendChild(a);
           a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(downloadUrl);
+          URL.revokeObjectURL(dl);
 
-          result.innerHTML +=
-            '<p style="color:#2ea043; font-weight:bold;">✓ SVG downloaded automatically!</p>';
-        } catch (err) {
-          preview.innerHTML =
-            '<p class="error">Preview/download failed (likely Pro icon or network issue).</p>';
-          result.innerHTML += `
-          <p class="error">Auto-download failed: ${err.message}</p>
-          <p>→ Right-click one of the links above and choose "Save link as..."</p>
-          <a href="${fullUrl}" class="download-btn" target="_blank">Open Full SVG in new tab</a>
-        `;
+          result.innerHTML += `<p style="color:#2ea043;font-weight:bold;">✓ SVG downloaded automatically!</p>`;
+        } catch {
+          preview.innerHTML = '<p class="error">Preview/download failed.</p>';
         }
       }
     </script>

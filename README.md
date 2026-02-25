@@ -7,7 +7,10 @@ Use the latest Font Awesome Pro Icons pack for free (for educational purposes an
 This small project was created for educational purposes only.
 
 Use this repository for personal testing or previewing how icons appear in your projects. If you find Font Awesome useful and can afford it, please support the creators by purchasing a Font Awesome Pro license.
-<https://fontawesome.com/plans>
+https://fontawesome.com/plans
+
+You can also **download icons** using the web tool:
+https://fa-pro-downloader.vercel.app/
 
 ## 🌐 Hosting & Usage
 
@@ -127,7 +130,10 @@ Simply add the following CSS links to the `head` section of your HTML file:
 />
 ```
 
-To obtain an individual icon's svg directly:
+<details>
+<summary><strong>To obtain an individual icon's svg directly</strong></summary>
+
+<br>
 
 ```
 https://site-assets.fontawesome.com/releases/v7.2.0/svgs-full/{icon-family}-{style}/{icon-name}.svg
@@ -148,3 +154,5 @@ Note:
     - e.g Duotone, Solid, globe-stand: `https://site-assets.fontawesome.com/releases/v7.2.0/svgs-full/duotone/globe-stand.svg`
 - Replace `{icon-name}` with the icon name found in FA's website
 - Example: Sharp Duotone, Light, globe-stand: `https://site-assets.fontawesome.com/releases/v7.2.0/svgs/sharp-duotone-light/globe-stand.svg`
+
+</details>
